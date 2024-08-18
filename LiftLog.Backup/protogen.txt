@@ -1,0 +1,1 @@
+protoc --csharp_out=Models/Test --experimental_allow_proto3_optional Models/**/*.proto
