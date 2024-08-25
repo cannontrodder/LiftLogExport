@@ -1,0 +1,6 @@
+#+title: LiftLog Records
+* Logs
+{{ for day in Model.DailyExercises | array.reverse }}
+** {{ day.Key | format_date}}
+{{ org_table day.Value }}
+{{ end }}

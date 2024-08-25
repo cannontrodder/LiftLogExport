@@ -8,14 +8,30 @@ namespace LiftLog.Backup;
 
 public class TemplateExport : IExport
 {
+
     public class TemplateModel()
     {
+
+        public record Daily(string Day, List<ExerciseRecord> Records);
+
         public List<ExerciseRecord> AllExercises { get; set; }
+
+        public SortedDictionary<DateOnly, List<ExerciseRecord>> DailyExercises 
+        {
+            get
+            {
+                Dictionary<DateOnly, List<ExerciseRecord>> group = AllExercises
+                    .GroupBy(e => e.Date)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+
+                return new(group);
+            }
+        }
     }
 
     public class Functions() : ScriptObject
     {
-        public static string Hello() => "Helll";
+        public static string FormatDate(DateOnly date) => date.ToString("yyyy-MM-dd");
         public static string Pad(string input, string member)
         {
             return input;
@@ -36,22 +52,22 @@ public class TemplateExport : IExport
             string[] times = records.Select(r => r.Time.ToString("HH:mm")).ToArray();
             string[] notes = records.Select(r => r.Notes).ToArray();
 
-            List<(string, string[])> cols = new()
+            List<(string, string[], bool)> cols = new()
             {
-                ("Date", dates),
-                ("Time", times),
-                ("Exercise", names),
-                ("Target Reps", targets),
-                ("Reps", reps),
-                ("Weight", weights),
-                ("Notes", notes),
+                ("Date", dates, false),
+                ("Time", times, false),
+                ("Exercise", names, false),
+                ("Target Reps", targets, true),
+                ("Reps", reps, true),
+                ("Weight", weights, true),
+                ("Notes", notes, false),
             };
 
             List<int> maxLengths = cols.Select(c => GetMaxLength(c.Item1, c.Item2)).ToList();
 
             for (int i = 0; i < maxLengths.Count; i++)
             {
-                sb.Append(AddOrgCol(cols[i].Item1, maxLengths[i]));
+                sb.Append(AddOrgCol(cols[i].Item1, maxLengths[i], cols[i].Item3));
             }
 
             sb.AppendLine("|");
@@ -67,7 +83,7 @@ public class TemplateExport : IExport
                 }
                 for (int i = 0; i < maxLengths.Count; i++)
                 {
-                    sb.Append(AddOrgCol(cols[i].Item2[r], maxLengths[i]));
+                    sb.Append(AddOrgCol(cols[i].Item2[r], maxLengths[i], cols[i].Item3));
                 }
 
                 sb.AppendLine("|");
@@ -89,17 +105,17 @@ public class TemplateExport : IExport
         private static int GetMaxLength(string header, string[] values) =>
             Math.Max(header.Length, values.MaxBy(v => v.Length)?.Length ?? 0);
 
-        private static string AddOrgCol(string v, int max)
+        private static string AddOrgCol(string v, int max, bool alignRight)
         {
             int padEnd = max - v.Length + 1;
-            string padding = new String(' ', padEnd);
-            v = v.Replace("\n", " ");
-            return $"| {v}{padding}";
+            string padding = new(' ', padEnd);
+            v = v.Replace("\n", " ").Trim();
+            return alignRight ? $"|{padding}{v} " : $"| {v}{padding}";
         }
 
         private static string AddOrgSeparator(int max)
         {
-            string padding = new String('-', max + 2);
+            string padding = new('-', max + 2);
             return $"|{padding}";
         }
     }

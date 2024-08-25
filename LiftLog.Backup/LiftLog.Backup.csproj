@@ -14,10 +14,12 @@
 
   <ItemGroup>
     <Folder Include="Generated\" />
-    <Folder Include="Templates\" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Templates\OrgDaily.template">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Templates\OrgMode.template">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
