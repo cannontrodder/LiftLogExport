@@ -1,35 +1,38 @@
-﻿using System.CommandLine;
+﻿using CommandLine;
 using LiftLog.Backup;
 
-namespace LiftLogCLI
+namespace LiftLogCLI;
+
+internal static class Program
 {
-    internal class Program
+    static async Task<int> Main(string[] args)
     {
-        static async Task<int> Main(string[] args)
+        ParserResult<Options> res = Parser.Default.ParseArguments<Options>(args);
+
+        if (res.Errors.Any())
         {
-            Option<FileInfo?> fileOption = new(
-                name: "--file",
-                getDefaultValue: () => new FileInfo("export.liftlogbackup.gz"),
-                description: "The backup file to read.");
-
-            RootCommand rootCommand = new("Export to CSV");
-            rootCommand.AddOption(fileOption);
-
-            rootCommand.SetHandler(async (file) =>
-            {
-                await ExportToCsv(file!);
-            },
-                fileOption);
-
-            return await rootCommand.InvokeAsync(args);
+            Console.Error.WriteLine("Invalid options.");
+            return 1;
         }
 
-        static async Task ExportToCsv(FileInfo file)
-        {
-            List<ExerciseRecord> data = await BackupReader.LoadExerciseRecords(file.FullName);
+        ExportOptions options = res.Value.ToExportOptions();
 
-            CsvExport exporter = new();
-            exporter.ExportExercises(data, new StreamWriter(Console.OpenStandardOutput()));
+        FileInfo file = new FileInfo(options.BackupFilePath);
+        if (!file.Exists)
+        {
+            Console.Error.WriteLine($"File not found: {options.BackupFilePath}.");
+            return 1;
         }
+
+        await ExportToCsv(options, file);
+        return 0;
+    }
+
+    static async Task ExportToCsv(ExportOptions options, FileInfo file)
+    {
+        List<ExerciseRecord> data = await BackupReader.LoadExerciseRecords(file.FullName);
+
+        CsvExport exporter = new();
+        exporter.ExportExercises(options, data, new StreamWriter(Console.OpenStandardOutput()));
     }
 }

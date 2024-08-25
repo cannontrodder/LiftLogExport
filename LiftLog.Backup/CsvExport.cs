@@ -27,7 +27,7 @@ public class CsvExport : IExport
         }
     }
 
-    public void ExportExercises(List<ExerciseRecord> exercises, StreamWriter writer)
+    public void ExportExercises(ExportOptions options, List<ExerciseRecord> exercises, StreamWriter writer)
     {
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
@@ -37,7 +37,6 @@ public class CsvExport : IExport
         using (var csv = new CsvWriter(writer, config))
         {
             csv.Context.RegisterClassMap<ExerciseMap>();
-            // csv.WriteHeader<ExerciseRecord>();
             csv.WriteRecords(exercises);
         }
     }

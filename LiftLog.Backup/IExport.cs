@@ -2,5 +2,5 @@
 
 public interface IExport
 {
-    void ExportExercises(List<ExerciseRecord> exercises, StreamWriter writer);
+    void ExportExercises(ExportOptions options, List<ExerciseRecord> exercises, StreamWriter writer);
 }
