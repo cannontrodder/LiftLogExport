@@ -24,7 +24,19 @@ internal static class Program
             return 1;
         }
 
-        await ExportToCsv(options, file);
+        switch (res.Value.OutputFormat.ToLowerInvariant())
+        {
+            case "csv":
+                await ExportToCsv(options, file);
+                break;
+            case "template":
+                await ExportToTemplate(options, file);
+                break;
+            default:
+                Console.Error.WriteLine($"Invalid output format: {res.Value.OutputFormat}.");
+                return 1;
+        }
+
         return 0;
     }
 
@@ -33,6 +45,14 @@ internal static class Program
         List<ExerciseRecord> data = await BackupReader.LoadExerciseRecords(file.FullName);
 
         CsvExport exporter = new();
+        exporter.ExportExercises(options, data, new StreamWriter(Console.OpenStandardOutput()));
+    }
+
+    static async Task ExportToTemplate(ExportOptions options, FileInfo file)
+    {
+        List<ExerciseRecord> data = await BackupReader.LoadExerciseRecords(file.FullName);
+
+        TemplateExport exporter = new();
         exporter.ExportExercises(options, data, new StreamWriter(Console.OpenStandardOutput()));
     }
 }

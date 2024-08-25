@@ -14,8 +14,24 @@ internal class Options
         Default = "export.liftlogbackup.gz")]
     public string File { get; set; } = string.Empty;
 
+    [Option(
+        'o',
+        "output",
+        Required = false,
+        HelpText = "Output format. 'CSV' or 'Template'.",
+        Default = "CSV")]
+    public string OutputFormat { get; set; } = string.Empty;
+
+    [Option(
+        't',
+        "template",
+        Required = false,
+        HelpText = "Template name. 'OrgMode'",
+        Default = "OrgMode")]
+    public string TemplateName { get; set; } = string.Empty;
+
     public ExportOptions ToExportOptions()
     {
-        return new ExportOptions(Verbose, File);
+        return new ExportOptions(Verbose, File, TemplateName);
     }
 }

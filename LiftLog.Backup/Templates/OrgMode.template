@@ -1,0 +1,3 @@
+#+title: LiftLog Records
+* Logs
+{{ org_table Model.AllExercises }}

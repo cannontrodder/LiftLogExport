@@ -40,7 +40,7 @@ public static class BackupReader
                             set.RecordedSet.RepsCompleted,
                             set.Weight,
                             session.Bodyweight,
-                            re.Notes
+                            re.Notes ?? string.Empty
                             ))))
             .OrderBy(r => r.Date)
             .ThenBy(r => r.Time)
