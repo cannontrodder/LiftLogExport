@@ -4,7 +4,7 @@
 ## Why Use Docker?
 
 * It encapsulates the LiftLog Backup CLI and its dependencies in a container, ensuring a consistent environment for report generation.
-* That container can then be ran on any system with Docker installed, regardless of the host OS, or if they even have all the tooling installed.
+* That container can then be run on any system with Docker installed, regardless of the host OS, or if they even have all the tooling installed.
 * It opens up opportunities to automate the report generation process after backup export.
 
 ## Features
@@ -15,6 +15,8 @@
 ## Build the Container
 
 You must at least have the [Docker Engine](https://docs.docker.com/engine/install/) installed on your system to build and run the container. If you don't have Docker installed, you can download it from the [official Docker website](https://docs.docker.com/get-docker/).
+
+Alternatively you can use [podman](https://podman.io/), just replace "docker" in the commands below with "podman".
 
 To build the Docker image for the LiftLog Backup CLI, use the following command:
 
@@ -31,14 +33,15 @@ This command will:
 To run the container and generate a report using a source file and template, you need to mount your current directory into the container and pass the appropriate arguments. Here’s an example command:
 
 ```bash
-docker run -v "$(pwd):/shellpwd" liftlog-cli -f ./2024-10-22-06-59-liftlogbackup.gz -t /Templates/OrgMod
+docker run -v "$(pwd):/shellpwd" liftlog-cli -f ./2024-10-22-06-59-liftlogbackup.gz -o Template -t /Templates/OrgMode
 ```
 
 ### Explanation:
 - `-v "$(pwd):/shellpwd"`: Mounts your current host directory to the `/shellpwd` folder in the container. This allows the CLI to access files in your current directory.
 - `liftlog-cli`: The Docker image name built earlier.
 - `-f ./2024-10-22-06-59-liftlogbackup.gz`: The `-f` flag specifies the path to your source file inside `/shellpwd`, which in this case is `./2024-10-22-06-59-liftlogbackup.gz`.
-- `-t /Templates/OrgMod`: The `-t` flag specifies the template to use for generating the report. In this example, the `OrgMod` template is located in `/Templates`.
+- `-o Template`: use a template file for the output. Defaults to CSV output if omitted.
+- `-t /Templates/OrgMode`: The `-t` flag specifies the template to use for generating the report. In this example, the `OrgMode` template is located in `/Templates`.
 
 ### Expected Output:
 This command will run the LiftLog CLI inside the container, using the source file you specified and the chosen template to generate a report.
